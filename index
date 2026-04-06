@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PsychSuite — Express Your Interest</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#f9f6f1}
+body{font-family:'DM Sans',sans-serif;color:#1a1a1a}
+.shell{display:grid;grid-template-columns:280px 1fr;height:100vh;max-width:1000px;margin:0 auto;box-shadow:0 0 60px rgba(0,0,0,.06)}
+
+/* LEFT PANEL — white/airy */
+.left{background:#fff;border-right:1px solid #e8e0d5;padding:2.5rem 2rem;display:flex;flex-direction:column;justify-content:space-between;position:sticky;top:0;height:100vh;overflow:hidden}
+.wordmark{font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:.3em;text-transform:uppercase;color:#8b6914;margin-bottom:2.5rem;display:block}
+.left-headline{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;line-height:1.2;color:#1a1a1a;margin-bottom:.75rem}
+.left-headline em{font-style:italic;color:#8b6914}
+.left-sub{font-size:12px;font-weight:300;color:#9a8f80;line-height:1.85;margin-bottom:1.75rem}
+.left-stats{display:flex;flex-direction:column;gap:0;margin-bottom:1.75rem}
+.left-stat{border-top:1px solid #e8e0d5;padding:11px 0}
+.left-stat-n{font-family:'Cormorant Garamond',serif;font-size:20px;color:#8b6914;display:block;margin-bottom:2px}
+.left-stat-l{font-size:10px;color:#b0a090;letter-spacing:.08em;text-transform:uppercase}
+.left-bullets{list-style:none;display:flex;flex-direction:column;gap:9px}
+.left-bullets li{font-size:11px;color:#6a5f52;font-weight:300;line-height:1.5;display:flex;gap:8px;align-items:flex-start}
+.left-bullets li::before{content:'—';color:#c9a96e;flex-shrink:0}
+.building-badge{margin-top:1.5rem;background:#fdf8ef;border:1px solid #e8d5a0;border-radius:6px;padding:10px 12px}
+.building-badge-title{font-size:10px;font-weight:500;color:#8b6914;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.building-badge-body{font-size:11px;color:#b0a090;font-weight:300;line-height:1.6}
+
+/* RIGHT PANEL */
+.right{background:#f9f6f1;padding:2.5rem 2.5rem 4rem;overflow-y:auto;height:100vh}
+.prog{display:flex;gap:5px;margin-bottom:2.5rem}
+.prog-seg{height:2px;flex:1;background:#e8e0d5;border-radius:1px;transition:background .4s}
+.prog-seg.on{background:#8b6914}
+.ps{display:none}.ps.active{display:block}
+.qlabel{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#b0a090;margin-bottom:10px}
+.qtitle{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;color:#1a1a1a;line-height:1.3;margin-bottom:5px}
+.qhint{font-size:13px;color:#9a8f80;font-weight:300;margin-bottom:1.5rem;line-height:1.7}
+.section-gap{margin-top:1.5rem}
+.opts{display:flex;flex-direction:column;gap:6px;margin-bottom:.5rem}
+.opt{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border:1.5px solid #e8e0d5;border-radius:8px;background:#fff;cursor:pointer;transition:border-color .15s,background .15s;text-align:left;width:100%;font-family:'DM Sans',sans-serif;gap:10px}
+.opt:hover{border-color:#c4b8a8;background:#fdfaf6}
+.opt.sel{border-color:#8b6914;background:#fdf8ef}
+.opt-body{display:flex;flex-direction:column;gap:2px;flex:1}
+.opt-title{font-size:13px;color:#1a1a1a;font-weight:400;line-height:1.4}
+.opt-sub{font-size:11px;color:#b0a090;font-weight:300}
+.opt-check{width:18px;height:18px;border-radius:50%;border:1.5px solid #ddd;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;background:#fff}
+.opt.multi .opt-check{border-radius:4px}
+.opt.sel .opt-check{background:#8b6914;border-color:#8b6914}
+.opt.sel .opt-check::after{content:'';display:block;width:5px;height:5px;border-radius:50%;background:#fff}
+.opt.multi.sel .opt-check::after{border-radius:1px}
+.info-box{background:#fff;border:1px solid #e8e0d5;border-left:3px solid #8b6914;border-radius:6px;padding:11px 13px;margin-bottom:1.1rem;margin-top:.5rem}
+.info-box-title{font-size:11px;font-weight:500;color:#8b6914;letter-spacing:.05em;margin-bottom:3px}
+.info-box-body{font-size:12px;color:#9a8f80;line-height:1.65;font-weight:300}
+.addon-badge{font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:#8b6914;background:#fdf3dd;border:1px solid #e8d5a0;border-radius:3px;padding:2px 6px;white-space:nowrap;flex-shrink:0}
+.field{margin-bottom:1.1rem}
+.flabel{display:block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#b0a090;margin-bottom:8px}
+input[type=text],input[type=email]{width:100%;background:#fff;border:1.5px solid #e8e0d5;border-radius:8px;color:#1a1a1a;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:300;padding:12px 14px;outline:none;transition:border-color .2s}
+input[type=text]::placeholder,input[type=email]::placeholder{color:#ccc}
+input[type=text]:focus,input[type=email]:focus{border-color:#8b6914}
+.slider-wrap{background:#fff;border:1.5px solid #e8e0d5;border-radius:8px;padding:14px 16px;margin-bottom:.5rem}
+.slider-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.slider-context{font-size:11px;color:#b0a090;font-weight:300}
+.slider-val{font-family:'Cormorant Garamond',serif;font-size:22px;color:#8b6914}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:3px;border-radius:2px;outline:none;border:none;padding:0;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#8b6914;cursor:pointer;border:2px solid #fff;box-shadow:0 1px 4px rgba(139,105,20,.3)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#8b6914;cursor:pointer;border:2px solid #fff}
+.slider-ticks{display:flex;justify-content:space-between;margin-top:5px}
+.slider-tick{font-size:10px;color:#c4b8a8}
+.nav{display:flex;gap:8px;margin-top:1.75rem}
+.btn-next{flex:1;padding:13px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;transition:background .15s}
+.btn-next:hover{background:#333}
+.btn-next:disabled{background:#ccc;cursor:not-allowed}
+.btn-back{padding:13px 18px;background:#fff;color:#9a8f80;border:1.5px solid #e8e0d5;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s}
+.btn-back:hover{border-color:#c4b8a8;color:#666}
+
+/* SUCCESS */
+.ty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;text-align:center;padding:2rem;position:relative;overflow:hidden}
+.brain-container{position:relative;width:120px;height:120px;margin:0 auto 1.5rem}
+.brain-pulse{position:absolute;inset:0;border-radius:50%;border:1.5px solid #e8d5a0;animation:pulse 2s ease-out 2s infinite}
+@keyframes pulse{0%{transform:scale(1);opacity:.8}100%{transform:scale(1.6);opacity:0}}
+.plane-scene{position:relative;width:100%;height:60px;margin-bottom:1.5rem;overflow:visible}
+.plane-fly{position:absolute;left:-60px;top:50%;transform:translateY(-50%) rotate(-5deg);animation:flyout 1.8s cubic-bezier(.2,0,.8,1) .3s forwards}
+@keyframes flyout{
+  0%{left:-60px;top:50%;transform:translateY(-50%) rotate(-5deg);opacity:1}
+  70%{opacity:1}
+  85%{left:110%;top:20%;transform:translateY(-50%) rotate(-15deg) scale(.7);opacity:.6}
+  100%{left:120%;top:10%;transform:translateY(-50%) rotate(-20deg) scale(.4);opacity:0}
+}
+.trail-line{position:absolute;top:50%;left:0;height:1px;width:0;background:linear-gradient(to right,transparent,#c4b8a8,transparent);transform:translateY(-50%);animation:trailgrow 1.4s ease .5s forwards}
+@keyframes trailgrow{0%{width:0;opacity:0}50%{width:80%;opacity:1}100%{width:100%;opacity:0}}
+.thought-bubble{position:absolute;right:15%;top:10%;opacity:0;animation:bubblein .5s ease 1.6s forwards}
+@keyframes bubblein{from{opacity:0;transform:scale(0) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.ty-mark,.ty-h,.ty-p,.ty-rule,.ty-note{opacity:0}
+.ty-mark.show{animation:fadeUp .6s ease 2.2s forwards}
+.ty-h.show{animation:fadeUp .6s ease 2.4s forwards}
+.ty-p.show{animation:fadeUp .6s ease 2.6s forwards}
+.ty-rule.show{animation:fadeUp .6s ease 2.8s forwards}
+.ty-note.show{animation:fadeUp .6s ease 3s forwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ty-mark{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#b0a090;margin-bottom:.75rem}
+.ty-h{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:400;color:#1a1a1a;line-height:1.2;margin-bottom:.6rem}
+.ty-h em{font-style:italic;color:#8b6914}
+.ty-p{font-size:13px;font-weight:300;color:#9a8f80;line-height:1.9}
+.ty-rule{width:28px;height:1px;background:#e8e0d5;margin:1.25rem auto}
+.ty-note{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:14px;color:#c4b8a8}
+
+@media(max-width:640px){
+  .shell{grid-template-columns:1fr;height:auto}
+  .left{height:auto;position:relative;padding:2rem 1.5rem}
+  .left-stats{flex-direction:row;gap:1rem}
+  .left-stat{border-top:none;border-left:1px solid #e8e0d5;padding:0 0 0 1rem}
+  .right{height:auto;padding:2rem 1.5rem 4rem}
+  .ty{min-height:60vh}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- LEFT PANEL -->
+  <div class="left">
+    <div>
+      <span class="wordmark">PsychSuite</span>
+      <div class="left-headline">Practice on<br>your terms.<br><em>Not theirs.</em></div>
+      <div class="left-sub">Private consultation suites for mental health clinicians. Commercial leases require a long-term commitment and far more space than you need. PsychSuite changes that.</div>
+      <div class="left-stats">
+        <div class="left-stat"><span class="left-stat-n">$590</span><span class="left-stat-l">starting / month</span></div>
+        <div class="left-stat"><span class="left-stat-n">$3.5K</span><span class="left-stat-l">avg. monthly savings</span></div>
+        <div class="left-stat"><span class="left-stat-n">Flexible</span><span class="left-stat-l">short &amp; long term options</span></div>
+      </div>
+      <ul class="left-bullets">
+        <li>Acoustically private — soundproofing options</li>
+        <li>Community space, grand rounds, peer events</li>
+        <li>DEA-registerable address — optional add-on</li>
+        <li>Furnished or unfurnished — your choice</li>
+      </ul>
+    </div>
+    <div class="building-badge">
+      <div class="building-badge-title">Currently in development</div>
+      <div class="building-badge-body">We're building this with input from clinicians like you. Your responses directly shape what we offer and where we open first.</div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right">
+    <div class="prog">
+      <div class="prog-seg on" id="p1"></div>
+      <div class="prog-seg" id="p2"></div>
+      <div class="prog-seg" id="p3"></div>
+      <div class="prog-seg" id="p4"></div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="ps active" id="s1">
+      <div class="qlabel">Step 1 of 4</div>
+      <div class="qtitle">About you</div>
+      <div class="qhint">No commitment — we'll follow up personally when your area is being considered.</div>
+      <div class="field"><label class="flabel">Name</label><input type="text" id="f-name" placeholder="Dr. Jane Smith"/></div>
+      <div class="field"><label class="flabel">Email</label><input type="email" id="f-email" placeholder="you@example.com"/></div>
+      <div class="field"><label class="flabel">Role</label><input type="text" id="f-role" placeholder="e.g. Psychiatrist, Therapist, PMHNP, Psychologist..."/></div>
+      <div class="qlabel section-gap">Current practice setting —</div>
+      <div class="opts" id="setting-opts">
+        <button class="opt" data-val="full-tele"><div class="opt-body"><span class="opt-title">Fully telehealth</span><span class="opt-sub">No physical office</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="hybrid"><div class="opt-body"><span class="opt-title">Hybrid</span><span class="opt-sub">Some in-person, some telehealth</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="inperson"><div class="opt-body"><span class="opt-title">Primarily in-person</span><span class="opt-sub">Have my own or shared space</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="employed"><div class="opt-body"><span class="opt-title">Hospital / system employed</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="pending"><div class="opt-body"><span class="opt-title">Not yet in practice / setting up</span></div><div class="opt-check"></div></button>
+      </div>
+      <div class="nav"><button class="btn-next" onclick="next1()">Continue</button></div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="ps" id="s2">
+      <div class="qlabel">Step 2 of 4</div>
+      <div class="qtitle">Where and how often?</div>
+      <div class="qhint">Select every area that would work for you.</div>
+      <div class="opts loc-all">
+        <button class="opt multi" data-val="pasadena"><div class="opt-body"><span class="opt-title">Pasadena</span></div><div class="opt-check"></div></button>
+        <button class="opt multi" data-val="westside-bevhills"><div class="opt-body"><span class="opt-title">Westside / Beverly Hills</span><span class="opt-sub">Santa Monica · Brentwood · West Hollywood · Beverly Hills</span></div><div class="opt-check"></div></button>
+        <button class="opt multi" data-val="sfv-foothills"><div class="opt-body"><span class="opt-title">San Fernando Valley / Foothills</span><span class="opt-sub">Sherman Oaks · Encino · Burbank · Arcadia · Monrovia</span></div><div class="opt-check"></div></button>
+        <button class="opt multi" data-val="southbay"><div class="opt-body"><span class="opt-title">South Bay</span><span class="opt-sub">Torrance · Manhattan Beach · El Segundo</span></div><div class="opt-check"></div></button>
+        <button class="opt multi" data-val="ie"><div class="opt-body"><span class="opt-title">Inland Empire</span><span class="opt-sub">Claremont · Ontario · Rancho Cucamonga · Pomona</span></div><div class="opt-check"></div></button>
+        <button class="opt multi" data-val="oc"><div class="opt-body"><span class="opt-title">Orange County</span><span class="opt-sub">Irvine · Newport Beach · Anaheim · Fullerton</span></div><div class="opt-check"></div></button>
+      </div>
+      <div class="qlabel section-gap">How often would you use a suite?</div>
+      <div class="opts" id="usage-opts">
+        <button class="opt" data-val="few-days"><div class="opt-body"><span class="opt-title">A few days per month</span><span class="opt-sub">Occasional in-person or compliance visits</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="1-2weeks"><div class="opt-body"><span class="opt-title">1–2 weeks per month</span><span class="opt-sub">Hybrid alongside telehealth</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="fulltime"><div class="opt-body"><span class="opt-title">Full-time — my primary office</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="unsure"><div class="opt-body"><span class="opt-title">Not sure yet</span></div><div class="opt-check"></div></button>
+      </div>
+      <div class="qlabel section-gap">What would you pay per month in your area?</div>
+      <div class="qhint" style="margin-top:-6px">Not a commitment — helps us calibrate pricing per market.</div>
+      <div class="slider-wrap">
+        <div class="slider-top">
+          <span class="slider-context" id="slider-context">per month</span>
+          <span class="slider-val" id="slider-display">$750/mo</span>
+        </div>
+        <input type="range" id="price-slider" min="200" max="5000" step="50" value="750" oninput="updateSlider(this.value)"/>
+        <div class="slider-ticks">
+          <span class="slider-tick">$200</span>
+          <span class="slider-tick">$1,250</span>
+          <span class="slider-tick">$2,500</span>
+          <span class="slider-tick">$3,750</span>
+          <span class="slider-tick">$5,000</span>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="btn-back" onclick="goBack(2)">Back</button>
+        <button class="btn-next" onclick="goNext(2)">Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="ps" id="s3">
+      <div class="qlabel">Step 3 of 4</div>
+      <div class="qtitle">Compliance and privacy</div>
+      <div class="qlabel">Would you need a DEA practice address?</div>
+      <div class="info-box">
+        <div class="info-box-title">DEA address — optional paid add-on</div>
+        <div class="info-box-body">The Ryan Haight Act requires prescribers of controlled substances via telemedicine to hold a DEA-registered practice address and complete at least one in-person evaluation. PsychSuite offers this as a paid add-on, including a registerable address and compliance documentation.</div>
+      </div>
+      <div class="opts" id="dea-opts">
+        <button class="opt" data-val="yes-addon">
+          <div class="opt-body"><span class="opt-title">Yes — I'd want the DEA address add-on</span><span class="opt-sub">Setting up or transferring my DEA registration</span></div>
+          <span class="addon-badge">Add-on</span>
+          <div class="opt-check"></div>
+        </button>
+        <button class="opt" data-val="maybe"><div class="opt-body"><span class="opt-title">Maybe — depends on the cost</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="no"><div class="opt-body"><span class="opt-title">No — I have a registered address already</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="na"><div class="opt-body"><span class="opt-title">Not applicable to my practice</span></div><div class="opt-check"></div></button>
+      </div>
+      <div class="qlabel section-gap">Sound privacy preference?</div>
+      <div class="info-box">
+        <div class="info-box-title">Sound masking vs. full soundproofing</div>
+        <div class="info-box-body">Sound masking makes speech unintelligible outside the room — HIPAA-appropriate and clinically sufficient. Full structural soundproofing blocks sound entirely at higher cost. We're exploring both options.</div>
+      </div>
+      <div class="opts" id="sound-opts">
+        <button class="opt" data-val="masking-fine"><div class="opt-body"><span class="opt-title">Sound masking is sufficient</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="prefer-soundproof"><div class="opt-body"><span class="opt-title">I'd prefer full soundproofing</span><span class="opt-sub">Worth $50–$100/mo more</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="soundproof-must"><div class="opt-body"><span class="opt-title">Full soundproofing is a dealbreaker</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="no-pref"><div class="opt-body"><span class="opt-title">No strong preference</span></div><div class="opt-check"></div></button>
+      </div>
+      <div class="nav">
+        <button class="btn-back" onclick="goBack(3)">Back</button>
+        <button class="btn-next" onclick="goNext(3)">Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="ps" id="s4">
+      <div class="qlabel">Step 4 of 4</div>
+      <div class="qtitle">Space and community</div>
+      <div class="qlabel">Furniture preference?</div>
+      <div class="info-box">
+        <div class="info-box-title">Furnished or unfurnished</div>
+        <div class="info-box-body">Suites available furnished (desk, ergonomic chair, minimal decor) or unfurnished — your choice at signup, same base rate.</div>
+      </div>
+      <div class="opts" id="furniture-opts">
+        <button class="opt" data-val="furnished"><div class="opt-body"><span class="opt-title">Furnished — ready to use day one</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="unfurnished"><div class="opt-body"><span class="opt-title">Unfurnished — I'll bring my own</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="either"><div class="opt-body"><span class="opt-title">Either works for me</span></div><div class="opt-check"></div></button>
+      </div>
+      <div class="qlabel section-gap">Would community programming matter to you?</div>
+      <div class="info-box">
+        <div class="info-box-title">More than just a room</div>
+        <div class="info-box-body">Each location includes a shared community space — peer consultation, grand rounds, CME events, informal socials. The collegial side of a hospital, without the bureaucracy.</div>
+      </div>
+      <div class="opts" id="community-opts">
+        <button class="opt" data-val="yes-key"><div class="opt-body"><span class="opt-title">Yes — would meaningfully influence my decision</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="yes-nice"><div class="opt-body"><span class="opt-title">Nice to have, not a deciding factor</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="no"><div class="opt-body"><span class="opt-title">No — just the space</span></div><div class="opt-check"></div></button>
+      </div>
+      <div class="qlabel section-gap">How did you hear about PsychSuite?</div>
+      <div class="opts" id="source-opts">
+        <button class="opt" data-val="colleague"><div class="opt-body"><span class="opt-title">Colleague or peer</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="residency"><div class="opt-body"><span class="opt-title">Residency / training network</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="social"><div class="opt-body"><span class="opt-title">Social media</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="search"><div class="opt-body"><span class="opt-title">Google / search</span></div><div class="opt-check"></div></button>
+        <button class="opt" data-val="other"><div class="opt-body"><span class="opt-title">Other</span></div><div class="opt-check"></div></button>
+      </div>
+      <div class="field section-gap">
+        <label class="flabel">Anything else? (optional)</label>
+        <input type="text" id="f-notes" placeholder="Parking, hours, EV charging, specific neighborhoods..."/>
+      </div>
+      <div class="nav">
+        <button class="btn-back" onclick="goBack(4)">Back</button>
+        <button class="btn-next" id="submit-btn" onclick="submitForm()">Submit my interest →</button>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="ps" id="s-success">
+      <div class="ty">
+        <div class="plane-scene">
+          <div class="trail-line"></div>
+          <div class="plane-fly">
+            <svg width="48" height="48" viewBox="0 0 52 52" fill="none">
+              <polygon points="2,26 50,6 38,26 50,46" fill="#1a1a1a" opacity=".85"/>
+              <polygon points="2,26 50,6 38,26" fill="#3a3530"/>
+              <polygon points="38,26 50,46 26,34" fill="#2a2520"/>
+              <line x1="2" y1="26" x2="38" y2="26" stroke="#f9f6f1" stroke-width=".6" opacity=".4"/>
+            </svg>
+          </div>
+          <!-- thought bubble -->
+          <div class="thought-bubble">
+            <svg width="60" height="44" viewBox="0 0 60 44" fill="none">
+              <rect x="2" y="2" width="56" height="32" rx="10" fill="#fdf8ef" stroke="#e8d5a0" stroke-width="1.5"/>
+              <circle cx="12" cy="40" r="3" fill="#fdf8ef" stroke="#e8d5a0" stroke-width="1.2"/>
+              <circle cx="6" cy="43" r="1.8" fill="#fdf8ef" stroke="#e8d5a0" stroke-width="1"/>
+              <text x="30" y="22" text-anchor="middle" font-family="Cormorant Garamond, serif" font-size="13" fill="#8b6914" font-style="italic">finally</text>
+            </svg>
+          </div>
+        </div>
+        <div class="ty-mark">PsychSuite</div>
+        <div class="ty-h">Your interest is <em>noted.</em></div>
+        <div class="ty-p">We'll reach out personally when we're exploring your area.<br>No newsletters. No noise. Just a real conversation.</div>
+        <div class="ty-rule"></div>
+        <div class="ty-note">Thank you for being here early.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const SHEET_URL='https://script.google.com/macros/s/AKfycbyUwyRok0zOrdh-omZTDI4A5ZCd58aN-GVEqh3xDwUVmmPLf-hTPUyPxaESRWzEW1648w/exec';
+
+const SK='ps_final';
+let fd={price:750};
+function getRs(){try{return JSON.parse(localStorage.getItem(SK)||'[]')}catch(e){return[]}}
+function saveLocal(r){const a=getRs();a.push(r);try{localStorage.setItem(SK,JSON.stringify(a))}catch(e){}}
+
+function setStep(n){
+  document.querySelectorAll('.ps').forEach(s=>s.classList.remove('active'));
+  document.getElementById(n==='success'?'s-success':'s'+n).classList.add('active');
+  for(let i=1;i<=4;i++){
+    const d=document.getElementById('p'+i);
+    if(d) d.classList.toggle('on',n==='success'?true:i<=n);
+  }
+  document.querySelector('.right').scrollTop=0;
+  if(n==='success') triggerSuccess();
+}
+
+function triggerSuccess(){
+  setTimeout(()=>{
+    ['ty-mark','ty-h','ty-p','ty-rule','ty-note'].forEach(c=>{
+      const el=document.querySelector('.'+c);
+      if(el) el.classList.add('show');
+    });
+  },100);
+}
+
+function updateSlider(v){
+  fd.price=parseInt(v);
+  document.getElementById('slider-display').textContent='$'+parseInt(v).toLocaleString()+'/mo';
+  const pct=((v-200)/(5000-200))*100;
+  document.getElementById('price-slider').style.background=
+    `linear-gradient(to right,#8b6914 0%,#8b6914 ${pct}%,#e8e0d5 ${pct}%,#e8e0d5 100%)`;
+}
+
+function updateSliderContext(){
+  const map={'few-days':'for a few days/month','1-2weeks':'for 1–2 weeks/month','fulltime':'for full-time access','unsure':'per month'};
+  document.getElementById('slider-context').textContent=map[fd.usage]||'per month';
+}
+
+function reg(id,key){
+  document.querySelectorAll('#'+id+' .opt').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      document.querySelectorAll('#'+id+' .opt').forEach(b=>b.classList.remove('sel'));
+      btn.classList.add('sel');
+      fd[key]=btn.dataset.val;
+      if(key==='usage') updateSliderContext();
+    });
+  });
+}
+
+document.querySelectorAll('.loc-all .opt').forEach(btn=>{
+  btn.addEventListener('click',()=>btn.classList.toggle('sel'));
+});
+
+function collectLocations(){
+  fd.locations=Array.from(document.querySelectorAll('.loc-all .opt.sel')).map(b=>b.dataset.val).join(', ');
+}
+
+function next1(){
+  const n=document.getElementById('f-name').value.trim();
+  const e=document.getElementById('f-email').value.trim();
+  const r=document.getElementById('f-role').value.trim();
+  if(!n||!e){alert('Please enter your name and email.');return;}
+  if(!r){alert('Please enter your role.');return;}
+  if(!fd.setting){alert('Please select your practice setting.');return;}
+  fd.name=n;fd.email=e;fd.role=r;
+  setStep(2);
+}
+
+function goNext(s){
+  if(s===2) collectLocations();
+  setStep(s+1);
+}
+
+function goBack(s){setStep(s-1);}
+
+async function submitForm(){
+  fd.notes=document.getElementById('f-notes').value.trim();
+  fd.timestamp=new Date().toISOString();
+  const payload={...fd};
+  saveLocal(payload);
+  const btn=document.getElementById('submit-btn');
+  btn.textContent='Submitting...';
+  btn.disabled=true;
+  try{
+    await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  }catch(err){
+    console.log('Sheet sync failed, saved locally.',err);
+  }
+  setStep('success');
+}
+
+reg('setting-opts','setting');
+reg('usage-opts','usage');
+reg('dea-opts','dea');
+reg('sound-opts','sound');
+reg('furniture-opts','furniture');
+reg('community-opts','community');
+reg('source-opts','source');
+updateSlider(750);
+</script>
+</body>
+</html>
